@@ -15,4 +15,4 @@ WORKDIR /app
 COPY --from=build /out .
 
 # Starte die Anwendung
-ENTRYPOINT ["dotnet", "ChatServer.dll"]
+ENTRYPOINT ["dotnet", "Chat Server.dll"]
