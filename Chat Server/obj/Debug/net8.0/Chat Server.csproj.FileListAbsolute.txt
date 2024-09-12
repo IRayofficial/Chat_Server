@@ -12,3 +12,4 @@ C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\refint\Chat 
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.pdb
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.genruntimeconfig.cache
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\ref\Chat Server.dll
+C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.sourcelink.json

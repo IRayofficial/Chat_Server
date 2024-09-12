@@ -1,51 +1,99 @@
-﻿using System;
-using System.Net;
+﻿using Chat_Server;
 using System.Net.Sockets;
+using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
 
+/*
+    Chatserver Client for the SimpleChat Client
+    This Server and Client is free to user
+    for the ChatClient just get the repository on Github: https://github.com/IRayofficial/Simple_Chat.git
+ */
 class ChatServer
 {
-    // Liste aller verbundenen Clients
-    private static List<TcpClient> connectedClients = new List<TcpClient>();
-
+    private static List<ClientInfo> connectedClients = new List<ClientInfo>();
+    private static string SignUpPattern = @"<username>(.*?)</username>|<public-key>(.*?)</public-key>";
+    private static string MessagePattern = @"<from>(.*?)</from>|<content>(.*?)</content>|<send-to>(.*?)</send-to>";
     static void Main(string[] args)
     {
-        // Erstelle einen TCP-Listener, der Verbindungen auf Port 8888 akzeptiert
         TcpListener server = new TcpListener(IPAddress.Any, 8888);
         server.Start();
-        Console.WriteLine("Chat-Server gestartet...");
-
-        // Endlos-Schleife, um auf neue Client-Verbindungen zu warten
+        Console.WriteLine("__________Simple Chat Server created________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("__________made by Raycraft Studios__________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("_____________Start Chat Server______________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("________Ready for client connections________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("____________________________________________");
+        Console.WriteLine("____________________________________________");
         while (true)
         {
-            TcpClient client = server.AcceptTcpClient(); // Warten auf neuen Client
-            connectedClients.Add(client); // Füge neuen Client zur Liste hinzu
-            Console.WriteLine("Neuer Client verbunden!");
-
-            // Starte einen Task, um den neuen Client zu handhaben
+            TcpClient client = server.AcceptTcpClient();
             Task.Run(() => HandleClient(client));
+            Console.WriteLine("__________Connected Clients: " + connectedClients.Count + 1 + "_______________");
         }
     }
 
-    // Verarbeite die Nachrichten eines verbundenen Clients
     private static void HandleClient(TcpClient client)
     {
         try
         {
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[1024];
-            int bytesRead;
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-            // Endlos-Schleife, um Nachrichten vom Client zu empfangen
+            string connectionMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            var matches = Regex.Matches(connectionMessage, SignUpPattern);
+            string userName = "";
+            string publicKey = "";
+            foreach (Match match in matches)
+            {
+                if (match.Groups[1].Success)
+                {
+                    userName = match.Groups[1].Value;
+                }
+                if (match.Groups[2].Success)
+                {
+                    publicKey = match.Groups[2].Value;
+                }    
+            }
+            
+            ClientInfo newClient = new ClientInfo
+            {
+                Client = client,
+                UserName = userName,
+                PublicKey = publicKey
+            };
+            connectedClients.Add(newClient);
+
+            Console.WriteLine(connectionMessage);
+            BroadcastUserList();
+
+            // Client Listener
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                Console.WriteLine("Nachricht empfangen: " + message);
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine(message);
 
-                // Sende die Nachricht an alle verbundenen Clients
-                BroadcastMessage(message, client);
+                var getMessage = Regex.Matches(message, MessagePattern);
+                string from = "";
+                string sendMessage = "";
+                string sendToIndex = "";
+                foreach (Match match in getMessage)
+                {
+                    if (match.Groups[1].Success) { from = match.Groups[1].Value; }
+                    if (match.Groups[2].Success) { sendMessage = match.Groups[2].Value; }
+                    if (match.Groups[3].Success) { sendToIndex = match.Groups[3].Value; }
+                }
+
+                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(sendMessage) && !string.IsNullOrEmpty(sendToIndex) && int.TryParse(sendToIndex,out int id))
+                {
+                    BroadcastMessage($"{sendMessage}", client, from, id);
+                }
             }
         }
         catch (Exception ex)
@@ -54,30 +102,66 @@ class ChatServer
         }
         finally
         {
-            client.Close();
-            connectedClients.Remove(client);
-            Console.WriteLine("Client getrennt.");
+            DisconnectClient(client);
         }
     }
 
-    // Sende eine Nachricht an alle Clients außer dem Sender
-    private static void BroadcastMessage(string message, TcpClient sender)
+    // Send message to destination
+    private static void BroadcastMessage(string message, TcpClient sender, string from, int id)
     {
-        byte[] buffer = Encoding.ASCII.GetBytes(message);
-        foreach (var client in connectedClients)
+        byte[] buffer = Encoding.UTF8.GetBytes("<type>MESSAGE</type><content><username>"+from+"</username><message>"+message+"</message></content>");
+        TcpClient destination = connectedClients[id].Client;
+        if (destination != sender)
         {
-            if (client != sender)
+            try
             {
-                try
-                {
-                    NetworkStream stream = client.GetStream();
-                    stream.Write(buffer, 0, buffer.Length);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Fehler beim Senden an Client: " + ex.Message);
-                }
+                NetworkStream stream = destination.GetStream();
+                stream.Write(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("--Send-Error:-" + ex.Message);
             }
         }
+
+    }
+
+    //Send ALL active user list
+    private static void BroadcastUserList()
+    {
+        StringBuilder userListMessage = new StringBuilder("<type>USERLIST</type><content>");
+        foreach (var client in connectedClients)
+        {
+            userListMessage.Append($"<client><username>{client.UserName}</username><public-key>{client.PublicKey}</public-key></client>");
+        }
+        userListMessage.Append("</content>");
+
+        byte[] buffer = Encoding.UTF8.GetBytes(userListMessage.ToString());
+        foreach (var clientInfo in connectedClients)
+        {
+            try
+            {
+                NetworkStream stream = clientInfo.Client.GetStream();
+                stream.Write(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("--Error:-" + ex.Message);
+            }
+        }
+    }
+
+    private static void DisconnectClient(TcpClient client)
+    {
+        var clientInfo = connectedClients.Find(c => c.Client == client);
+        if (clientInfo != null)
+        {
+            connectedClients.Remove(clientInfo);
+            Console.WriteLine($"Client-{clientInfo.UserName}-disconnected.");
+
+            BroadcastUserList();
+        }
+
+        client.Close();
     }
 }
