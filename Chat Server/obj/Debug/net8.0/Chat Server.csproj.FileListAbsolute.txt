@@ -13,3 +13,18 @@ C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.genruntimeconfig.cache
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\ref\Chat Server.dll
 C:\Users\IRay\source\repos\Chat Server\Chat Server\obj\Debug\net8.0\Chat Server.sourcelink.json
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\bin\Debug\net8.0\Chat Server.exe
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\bin\Debug\net8.0\Chat Server.deps.json
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\bin\Debug\net8.0\Chat Server.runtimeconfig.json
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\bin\Debug\net8.0\Chat Server.dll
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\bin\Debug\net8.0\Chat Server.pdb
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.AssemblyInfoInputs.cache
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.AssemblyInfo.cs
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.csproj.CoreCompileInputs.cache
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.sourcelink.json
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.dll
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\refint\Chat Server.dll
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.pdb
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\Chat Server.genruntimeconfig.cache
+C:\Users\Olive\Desktop\GH\Chat_Server\Chat Server\obj\Debug\net8.0\ref\Chat Server.dll
