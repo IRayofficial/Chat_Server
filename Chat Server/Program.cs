@@ -75,20 +75,20 @@ class ChatServer
                     Console.WriteLine(message);
 
                     var getMessage = Regex.Matches(message, MessagePattern);
-                    string from = "";
+                    string senderId = "";
                     string sendMessage = "";
                     string sendToIndex = "";
                     foreach (Match match in getMessage)
                     {
-                        if (match.Groups[1].Success) { from = match.Groups[1].Value; }
+                        if (match.Groups[1].Success) { senderId = match.Groups[1].Value; }
                         if (match.Groups[2].Success) { sendMessage = match.Groups[2].Value; }
                         if (match.Groups[3].Success) { sendToIndex = match.Groups[3].Value; }
                     }
 
-                    if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(sendMessage) 
-                        && !string.IsNullOrEmpty(sendToIndex) && int.TryParse(sendToIndex, out int id))
+                    if (!string.IsNullOrEmpty(senderId) && !string.IsNullOrEmpty(sendMessage) 
+                        && !string.IsNullOrEmpty(sendToIndex) && int.TryParse(sendToIndex, out int id) && int.TryParse(senderId, out int sender))
                     {
-                        BroadcastMessage($"{sendMessage}", client, from, id);
+                        BroadcastMessage($"{sendMessage}", client, sender, id);
                     }
                 }
             }            
@@ -98,9 +98,9 @@ class ChatServer
     }
 
     // Send message to destination
-    private static void BroadcastMessage(string message, TcpClient sender, string from, int id)
+    private static void BroadcastMessage(string message, TcpClient sender, int senderId, int id)
     {
-        byte[] buffer = Encoding.UTF8.GetBytes(BuildMessageBlock(from, message));
+        byte[] buffer = Encoding.UTF8.GetBytes(BuildMessageBlock(senderId, message));
         TcpClient destination = connectedClients[id].Client;
         if (destination != sender)
         {
@@ -117,9 +117,9 @@ class ChatServer
     }
 
     //Builder for Message 
-    private static string BuildMessageBlock(string senderName, string message)
+    private static string BuildMessageBlock(int senderId, string message)
     {
-        return "<type>MESSAGE</type><content><username>" + senderName + "</username><message>" + message + "</message></content>";
+        return "<type>MESSAGE</type><content><sender-id>" + senderId + "</sender-id><message>" + message + "</message></content>";
     }
 
     //Builder for sendable user list 
